@@ -657,7 +657,7 @@ while(<>) {
 ####### ADD SPAM from spamd - TraubS audius, 29122017
     if(($logRmdr =~ m(spamd\[\d+\])) == 1)
     {
-	if (($logRmdr =~ m(result: Y? \d+) == 1)
+	if (($logRmdr =~ m(result: Y? \d+)) == 1)
 	{
 	    ++$spams;
 	}
