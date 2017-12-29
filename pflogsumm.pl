@@ -989,7 +989,7 @@ if(defined($dateStr)) {
 
 print_subsect_title("Grand Totals");
 print "messages\n\n";
-printf " %6d%s  spam taged\n", adj_int_units($spams);
+
 printf " %6d%s  received\n", adj_int_units($msgsRcvd);
 printf " %6d%s  delivered\n", adj_int_units($msgsDlvrd);
 printf " %6d%s  forwarded\n", adj_int_units($msgsFwdd);
@@ -997,6 +997,7 @@ printf " %6d%s  deferred", adj_int_units($msgsDfrd);
 printf "  (%d%s deferrals)", adj_int_units($msgsDfrdCnt) if($msgsDfrdCnt);
 print "\n";
 printf " %6d%s  bounced\n", adj_int_units($msgsBncd);
+printf " %6d%s  spam tagged\n", adj_int_units($spams);
 printf " %6d%s  rejected (%d%%)\n", adj_int_units($msgsRjctd), $msgsRjctdPct;
 printf " %6d%s  reject warnings\n", adj_int_units($msgsWrnd);
 printf " %6d%s  held\n", adj_int_units($msgsHld);
