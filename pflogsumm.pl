@@ -467,6 +467,7 @@ my (
     %rejects, $msgsRjctd,
     %warns, $msgsWrnd,
     %discards, $msgsDscrdd,
+    $spams,
     %holds, $msgsHld,
     %rcvdMsg, $msgsFwdd, $msgsBncd,
     $msgsDfrdCnt, $msgsDfrd, %msgDfrdFlgs,
@@ -652,6 +653,16 @@ while(<>) {
 
     next if (@timeRange and not in_timerange([$msgYr, $msgMon + 1, $msgDay, $msgHr, $msgMin, $msgSec], \@timeRange));
 
+####### ADD SPAM from spamd - TraubS audius, 29122017
+    if(($logRmdr =~ m(spamd\[\d+\])) == 1)
+    {
+	if (($logRmdr =~ m(result: Y \d+)) == 1)
+	{
+	    ++$spams;
+	}
+    }
+####### END SPAM
+
     unless((($cmd, $qid) = $logRmdr =~ m#^(?:postfix-?\w*|$syslogName)(?:/(?:smtps|submission))?/([^\[:]*).*?: ([^:\s]+)#o) == 2 ||
            (($cmd, $qid) = $logRmdr =~ m#^((?:postfix)(?:-script)?)(?:\[\d+\])?: ([^:\s]+)#o) == 2 ||
            (($cmd, $qid) = $logRmdr =~ m#^MailScanner\[\d+\]: (Requeue): (\w+)\.#) == 2) 
@@ -706,6 +717,17 @@ while(<>) {
 	}
 	++$rejPerHr[$msgHr];
 	++${$msgsPerDay{$revMsgDateStr}}[4];
+####### begin of patch from https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=743570;msg=5 with bug fix
+     } elsif($cmd eq "cleanup" && (($rejReas, $rejRmdr) = $logRmdr =~
+        /\/cleanup\[\d+\]: .*?\b(milter-reject: .*) from (?:[^:]+): (.*)$/) == 2)
+       {
+         $rejRmdr =~ s/( from \S+?)?; from=<.*$// unless($opts{'verbMsgDetail'});
+         $rejRmdr = string_trimmer($rejRmdr, 64, $opts{'verbMsgDetail'});
+         ++$rejects{$cmd}{$rejReas}{$rejRmdr} unless($opts{'rejectDetail'} == 0);
+         ++$msgsRjctd;
+         ++$rejPerHr[$msgHr];
+         ++${$msgsPerDay{$revMsgDateStr}}[4];
+###### end of patch ######
     } elsif($qid eq 'warning') {
 	(my $warnReas = $logRmdr) =~ s/^.*warning: //;
 	$warnReas = string_trimmer($warnReas, 66, $opts{'verbMsgDetail'});
@@ -966,6 +988,7 @@ if(defined($dateStr)) {
 
 print_subsect_title("Grand Totals");
 print "messages\n\n";
+printf " %6d%s  spam taged\n", adj_int_units($spams);
 printf " %6d%s  received\n", adj_int_units($msgsRcvd);
 printf " %6d%s  delivered\n", adj_int_units($msgsDlvrd);
 printf " %6d%s  forwarded\n", adj_int_units($msgsFwdd);
