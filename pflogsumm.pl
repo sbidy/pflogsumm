@@ -6,7 +6,8 @@ eval 'exec perl -S $0 "$@"'
 
 pflogsumm.pl - Produce Postfix MTA logfile summary
 
-Copyright (C) 1998-2010 by James S. Seymour, Release 1.1.5
+Copyright (C) 1998-2010 by James S. Seymour, Release 1.1.5b
+Patch by Stephan Traub, audius GmbH
 
 =head1 SYNOPSIS
 
@@ -408,7 +409,7 @@ eval { require Date::Calc };
 my $hasDateCalc = $@ ? 0 : 1;
 
 my $mailqCmd = "mailq";
-my $release = "1.1.5";
+my $release = "1.1.5b";
 
 # Variables and constants used throughout pflogsumm
 use vars qw(
